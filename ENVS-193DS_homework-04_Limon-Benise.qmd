@@ -1,0 +1,160 @@
+---
+title: "Homework 4"
+author: "Benise Limon"
+format: docx
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(lterdatasampler)
+library(performance)
+library(broom)
+library(ggeffects)
+library(car)
+library(naniar)
+library(flextable)
+```
+
+How does fish length predict fish weight for trout perch (across all sample years)?\
+This data set, like most observational environmental or ecological data sets, is noisy (i.e. a lot of spread between points). It is also somewhat messy. You are expected to read the metadata, protocols, and all relevant information on the EDI portal before working with the data.
+
+# Problem 1
+
+1\. Write your null and alternative hypotheses in mathematical and biological terms.
+
+H0:
+
+HA:
+
+\
+2. Create a visualization of the missing data for the filtered data set containing the\
+observations you will use.
+
+```{r}
+fish <- read.csv(here("data/ntl6_v12.csv"))
+```
+
+```{r}
+gg_miss_var(fish)
+```
+
+\
+a. Write an accompanying caption explaining how/if the missing data is relevant to\
+your hypotheses.
+
+Only data from the "weight" column is missing so it is not relevant.
+
+\
+3. Run your test.
+
+```{r}
+#ran this to find the name for trout perch 
+#unique(fish$spname)
+```
+
+```{r}
+fish_clean <- fish %>% 
+  filter(spname == "TROUTPERCH")
+```
+
+\
+4. Visually check the assumptions of your test. Display your diagnostic plots in a grid.
+
+```{r}
+modelobject <- lm(length ~ weight, data = fish_clean)
+```
+
+```{r}
+# makes the viewer pane show a 2x2 grid of plots
+# format: par(mfrow = c(number of rows, number of columns))
+par(mfrow = c(2, 2))
+plot(modelobject)
+```
+
+```{r}
+# turns off the 2x2 grid - pop this under the code chunk where you set the 2x2 grid
+dev.off()
+```
+
+\
+5. For each diagnostic plot, describe in 1-2 sentences what it is showing you, and what you\
+decide after looking at the plot.
+
+\
+6. Display the results from summary() using your model object.
+
+```{r}
+# store the model summary as an object
+model_summary <- summary(modelobject)
+
+# store the ANOVA table as an object
+# anova(): special function to get analysis of variance tables for a model
+model_squares <- anova(modelobject)
+
+model_summary
+```
+
+7\. Create a table that summarizes the ANOVA table. Make sure this table has informative\
+column and row names and p-values displayed without scientific notation.
+
+```{r}
+model_squares
+```
+
+```{r}
+# don't name this chunk! some intricacies with Quarto: do not name chunks with tables in them
+
+model_squares_table <- tidy(model_squares) %>% 
+  # round the sum of squares and mean squares columns to have 5 digits (could be less)
+  mutate(across(sumsq:meansq, ~ round(.x, digits = 5))) %>% 
+  # round the F-statistic to have 1 digit
+  mutate(statistic = round(statistic, digits = 1)) %>% 
+  # replace the very very very small p value with < 0.001
+  mutate(p.value = case_when(
+    p.value < 0.001 ~ "< 0.001"
+  )) %>% 
+  # rename the length cell to be meaningful
+  mutate(term = case_when(
+    term == "length" ~ "Length (mm)",
+    TRUE ~ term
+  )) %>% 
+  # make the data frame a flextable object
+  flextable() %>% 
+  # change the header labels to be meaningful
+  set_header_labels(df = "Degrees of Freedom", 
+                    sumsq = "Sum of squares",
+                    meansq = "Mean squares",
+                    statistic = "F-statistic",
+                    p.value = "p-value")
+
+model_squares_table
+```
+
+\
+8. In 1-2 sentences, describe how the ANOVA table relates to the information you get from\
+the summary() object.
+
+\
+9. In 2-3 sentences, summarize your results in prose with in-text references to test results.\
+Include all relevant information.
+
+\
+10. Create a visualization with model predictions and confidence intervals on top of the\
+underlying data. Finalize your plot.
+
+\
+a. Write an accompanying caption.
+
+\
+Checklist\
+Your submission should include\
+- A link to your public GitHub repo for this homework assignment that includes\
+- An informative readme\
+- File organization\
+- At least 5 commits\
+- Only relevant code and outputs, with no messages or warnings\
+- Annotated, spaced out code\
+- Written captions and results summaries\
+- Additionally, your submission should be submitted to Canvas by 11:59 PM on Tuesday 23 May
