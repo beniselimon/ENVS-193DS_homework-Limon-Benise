@@ -3,9 +3,13 @@ title: "Homework 4"
 author: "Benise Limon"
 format: docx
 editor: visual
+execute: 
+  message: false
+  warning: false
 ---
 
 ```{r}
+#call the packages I want to use 
 library(tidyverse)
 library(here)
 library(lterdatasampler)
@@ -24,56 +28,68 @@ This data set, like most observational environmental or ecological data sets, is
 
 1\. Write your null and alternative hypotheses in mathematical and biological terms.
 
-H0:
+Biological:
 
-HA:
+H0: Fish length does not predict fish weight for trout perch across all sample years.
+
+HA: Fish length does predict fish weight for trout perch across all sample years.
+
+Mathematical:
+
+H0: β1 = 0
+
+HA: β1 ≠ 0
 
 \
 2. Create a visualization of the missing data for the filtered data set containing the\
 observations you will use.
 
-```{r}
+```{r read-data}
+#make an object that reads the CSV file containing the data 
 fish <- read.csv(here("data/ntl6_v12.csv"))
 ```
 
-```{r}
-gg_miss_var(fish)
+```{r filtered-data}
+#filter the data to only include trout 
+fish_clean <- fish %>% 
+  filter(spname == "TROUTPERCH")
+```
+
+```{r missing-data-vis}
+#visualize missing data 
+gg_miss_var(fish_clean) +
+  #add a caption of how missing data affects hypothesis 
+  labs (caption = str_wrap("Figure 1. There are 200 missing observations for fish weight. This affects our hypothesis to understand if fish length predicts fish weight.")) +
+  theme(
+    plot.caption = element_text(hjust = 0)
+  )
 ```
 
 \
 a. Write an accompanying caption explaining how/if the missing data is relevant to\
 your hypotheses.
 
-Only data from the "weight" column is missing so it is not relevant.
+There are 200 observations from the "weight" column are missing. Since it is missing, we will have to delete the null values from the data set, meaning there are less observations to work with. The linear regression is intended to see if fish length can predict fish weight, missing some values of fish weight gives us less data to base our analysis on.
 
 \
 3. Run your test.
 
-```{r}
-#ran this to find the name for trout perch 
-#unique(fish$spname)
-```
-
-```{r}
-fish_clean <- fish %>% 
-  filter(spname == "TROUTPERCH")
+```{r model-object}
+#create a model object containing the linear model for if fish length predicts weight using the filtered data frame
+modelobject <- lm(weight ~ length, data = fish_clean)
 ```
 
 \
 4. Visually check the assumptions of your test. Display your diagnostic plots in a grid.
 
-```{r}
-modelobject <- lm(length ~ weight, data = fish_clean)
-```
-
-```{r}
+```{r display-model}
 # makes the viewer pane show a 2x2 grid of plots
 # format: par(mfrow = c(number of rows, number of columns))
 par(mfrow = c(2, 2))
 plot(modelobject)
 ```
 
-```{r}
+```{r dev-off}
 # turns off the 2x2 grid - pop this under the code chunk where you set the 2x2 grid
 dev.off()
 ```
@@ -82,24 +98,30 @@ dev.off()
 5. For each diagnostic plot, describe in 1-2 sentences what it is showing you, and what you\
 decide after looking at the plot.
 
+Residuals vs Fitted:
+
+Scale-location:
+
+Normal QQ:
+
+Residuals vs Leverage:
+
 \
 6. Display the results from summary() using your model object.
 
-```{r}
+```{r summary-table}
 # store the model summary as an object
 model_summary <- summary(modelobject)
-
-# store the ANOVA table as an object
-# anova(): special function to get analysis of variance tables for a model
-model_squares <- anova(modelobject)
-
-model_summary
 ```
 
 7\. Create a table that summarizes the ANOVA table. Make sure this table has informative\
 column and row names and p-values displayed without scientific notation.
 
-```{r}
+```{r anova-table}
+# store the ANOVA table as an object
+# anova(): special function to get analysis of variance tables for a model
+model_squares <- anova(modelobject)
+
 model_squares
 ```
 
@@ -108,7 +130,7 @@ model_squares
 
 model_squares_table <- tidy(model_squares) %>% 
   # round the sum of squares and mean squares columns to have 5 digits (could be less)
-  mutate(across(sumsq:meansq, ~ round(.x, digits = 5))) %>% 
+  mutate(across(sumsq:meansq, ~ round(.x, digits = 2))) %>% 
   # round the F-statistic to have 1 digit
   mutate(statistic = round(statistic, digits = 1)) %>% 
   # replace the very very very small p value with < 0.001
@@ -136,18 +158,53 @@ model_squares_table
 8. In 1-2 sentences, describe how the ANOVA table relates to the information you get from\
 the summary() object.
 
+The ANOVA table relates to the information from the summary() object because \_\_\_\_\_.
+
 \
-9. In 2-3 sentences, summarize your results in prose with in-text references to test results.\
-Include all relevant information.
+9. In 2-3 sentences, summarize your results in prose with in-text references to test results. Include all relevant information.
+
+The results from this linear regression were that \_\_\_\_\_.
 
 \
 10. Create a visualization with model predictions and confidence intervals on top of the\
 underlying data. Finalize your plot.
 
+```{r model-predictions}
+# extract model predictions using ggpredict
+predictions <- ggpredict(modelobject, terms = "length")
+
+predictions
+```
+
+```{r}
+plot_predictions <- ggplot(data = fish_clean, 
+                           aes(x = length, y = weight)) +
+  # first plot the underlying data from fish_clean
+  geom_point() +
+  # then plot the predictions
+  geom_line(data = predictions, 
+            aes(x = x, y = predicted), 
+            color = "green", linewidth = 1) +
+  # then plot the 95% confidence interval from ggpredict
+  geom_ribbon(data = predictions, 
+              aes(x = x, y = predicted, ymin = conf.low, ymax = conf.high), 
+              alpha = 0.2) +
+  # theme and meaningful labels
+  theme_bw() +
+  labs(x = "Trout Perch length (mm)",
+       y = "Trout Perch weight (g)", 
+       caption = "Figure 2. A visualization of using fish length to predict fish weight in Trout Perch. A ___ increase in length (mm) predicts a ___ increase in weight (g)") +
+        theme(
+    plot.caption = element_text(hjust = 1))
+
+plot_predictions
+```
+
 \
 a. Write an accompanying caption.
 
-\
+A visualization of using fish length to predict fish weight in Trout Perch. A \_\_\_ increase in length (mm) predicts a \_\_\_ increase in weight (g)\
+
 Checklist\
 Your submission should include\
 - A link to your public GitHub repo for this homework assignment that includes\
