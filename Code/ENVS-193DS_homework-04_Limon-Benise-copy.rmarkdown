@@ -21,6 +21,7 @@ library(naniar)
 library(flextable)
 ```
 
+
 How does fish length predict fish weight for trout perch (across all sample years)?\
 This data set, like most observational environmental or ecological data sets, is noisy (i.e. a lot of spread between points). It is also somewhat messy. You are expected to read the metadata, protocols, and all relevant information on the EDI portal before working with the data.
 
@@ -44,6 +45,7 @@ HA: β1 ≠ 0
 2. Create a visualization of the missing data for the filtered data set containing the\
 observations you will use.
 
+
 ```{r read-data}
 #make an object that reads the CSV file containing the data 
 fish <- read.csv(here("data/ntl6_v12.csv"))
@@ -66,6 +68,7 @@ gg_miss_var(fish_clean) +
   )
 ```
 
+
 \
 a. Write an accompanying caption explaining how/if the missing data is relevant to\
 your hypotheses.
@@ -75,13 +78,16 @@ There are 200 observations from the "weight" column are missing. Since it is mis
 \
 3. Run your test.
 
+
 ```{r model-object}
 #create a model object containing the linear model for if fish length predicts weight using the filtered data frame
 modelobject <- lm(weight ~ length, data = fish_clean)
 ```
 
+
 \
 4. Visually check the assumptions of your test. Display your diagnostic plots in a grid.
+
 
 ```{r display-model}
 # makes the viewer pane show a 2x2 grid of plots
@@ -94,6 +100,7 @@ plot(modelobject)
 # turns off the 2x2 grid - pop this under the code chunk where you set the 2x2 grid
 dev.off()
 ```
+
 
 \
 5. For each diagnostic plot, describe in 1-2 sentences what it is showing you, and what you\
@@ -110,6 +117,7 @@ Residuals vs Leverage: Shows us if the outliers are influencing the model estima
 \
 6. Display the results from summary() using your model object.
 
+
 ```{r summary-table}
 # store the model summary as an object
 model_summary <- summary(modelobject)
@@ -117,8 +125,10 @@ model_summary <- summary(modelobject)
 model_summary
 ```
 
+
 7\. Create a table that summarizes the ANOVA table. Make sure this table has informative\
 column and row names and p-values displayed without scientific notation.
+
 
 ```{r anova-table}
 # store the ANOVA table as an object
@@ -157,6 +167,7 @@ model_squares_table <- tidy(model_squares) %>%
 model_squares_table
 ```
 
+
 \
 8. In 1-2 sentences, describe how the ANOVA table relates to the information you get from\
 the summary() object.
@@ -171,6 +182,7 @@ The results from this linear regression were that fish length can be used to pre
 \
 10. Create a visualization with model predictions and confidence intervals on top of the\
 underlying data. Finalize your plot.
+
 
 ```{r model-predictions}
 # extract model predictions using ggpredict
@@ -205,5 +217,18 @@ plot_predictions <- ggplot(data = fish_clean,
 plot_predictions
 ```
 
+
 \
 a. Write an accompanying caption.
+
+Checklist\
+Your submission should include\
+- A link to your public GitHub repo for this homework assignment that includes\
+- An informative readme\
+- File organization\
+- At least 5 commits\
+- Only relevant code and outputs, with no messages or warnings\
+- Annotated, spaced out code\
+- Written captions and results summaries\
+- Additionally, your submission should be submitted to Canvas by 11:59 PM on Tuesday 23 May
+
