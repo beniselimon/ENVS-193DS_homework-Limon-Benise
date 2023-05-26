@@ -98,13 +98,13 @@ dev.off()
 5. For each diagnostic plot, describe in 1-2 sentences what it is showing you, and what you\
 decide after looking at the plot.
 
-Residuals vs Fitted:
+Residuals vs Fitted: Tells you about homoscedasticity of variance. In the relationship between errors or residuals there is a cluster in the middle around the red line. The red line is pretty straight meaning they are constant throughout the range of x and y values.
 
-Scale-location:
+Scale-location: Tells you about homoscedasticity of variance. It uses the square root of standardized residuals. The plot shows the data is more clustered in the middle but around the red line. The line is pretty straight across which means that there is good homoscedasticity.
 
-Normal QQ:
+Normal QQ: Shows us if the errors are normally distributed. The data is pretty clustered around the straight normal line meaning that the data is pretty normally distributed.
 
-Residuals vs Leverage:
+Residuals vs Leverage: Shows us if the outliers are influencing the model estimates. It measures the influence of a single observation on the model. There are a good amount of data points labeled meaning there are some outliers present in the data. This is also called the Cook's model.
 
 \
 6. Display the results from summary() using your model object.
