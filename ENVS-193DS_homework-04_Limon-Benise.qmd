@@ -112,6 +112,8 @@ Residuals vs Leverage:
 ```{r summary-table}
 # store the model summary as an object
 model_summary <- summary(modelobject)
+
+model_summary
 ```
 
 7\. Create a table that summarizes the ANOVA table. Make sure this table has informative\
@@ -158,12 +160,12 @@ model_squares_table
 8. In 1-2 sentences, describe how the ANOVA table relates to the information you get from\
 the summary() object.
 
-The ANOVA table relates to the information from the summary() object because \_\_\_\_\_.
+The ANOVA table relates to the information from the summary() object because the it is created using the anova function which extracts summary information from the model object, including the degrees of freedom, sum of squares, mean squares, and the p-value. The ANOVA table uses the summary of the model object to understand if there is a significant relationship between the predictor variable and what you are trying to predict.
 
 \
 9. In 2-3 sentences, summarize your results in prose with in-text references to test results. Include all relevant information.
 
-The results from this linear regression were that \_\_\_\_\_.
+The results from this linear regression were that fish length can be used to predict fish weight. The null hypothesis was rejected because the p-value was \<0.001. The high R\^2 value explains 81.58% of the variance all fish weight observations can be predicted by the model. The low mean squared value of 1.12 supports the alternative hypothesis because on average the model only differs from the actual values by 1.12g. The scatter plot visually shows the observations are clustered along the regression line, indicating the regression line is a good fit. Analysis of variance, F(1,288) = 1280 p\< 0.001, a = 0.05.
 
 \
 10. Create a visualization with model predictions and confidence intervals on top of the\
